@@ -1,0 +1,10 @@
+{
+	"hooks": {
+		"stop": [
+			{
+				"command": "pnpm run prepush",
+				"description": "Executes lint, test, and build before Claude finishes its task"
+			}
+		]
+	}
+}

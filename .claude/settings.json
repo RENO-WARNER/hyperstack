@@ -1,0 +1,14 @@
+{
+	"includeCoAuthoredBy": false,
+	"permissions": {
+		"deny": [
+			"**/*.env",
+			"**/node_modules/**",
+			"**/dist/**",
+			"**/.venv/**",
+			"**/__pycache__/**",
+			"**/.ipynb_checkpoints/**",
+			"**/target/**"
+		]
+	}
+}

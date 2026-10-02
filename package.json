@@ -1,0 +1,42 @@
+{
+	"name": "hyper-stack",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"prepare": "husky",
+		"precommit": "pnpm run format",
+		"commitmsg": "commitlint --edit",
+		"prepush": "pnpm run check && pnpm run test",
+		"format": "biome format --write . && pnpm -r --if-present run format",
+		"check": "biome check . && tsc && pnpm -r --if-present run check",
+		"dev": "vite",
+		"build": "tsc && vite build && pnpm -r --if-present run build",
+		"test": "pnpm -r --if-present run test"
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "^11.8.0",
+			"onFail": "download"
+		}
+	},
+	"commitlint": {
+		"extends": [
+			"@commitlint/config-conventional"
+		]
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.5",
+		"@commitlint/cli": "^21.2.1",
+		"@commitlint/config-conventional": "^21.2.0",
+		"@preact/preset-vite": "^2.10.6",
+		"@tailwindcss/vite": "^4.3.3",
+		"husky": "^9.1.7",
+		"tailwindcss": "^4.3.3",
+		"typescript": "^7.0.2",
+		"vite": "^8.3.2"
+	},
+	"dependencies": {
+		"preact": "^11.0.0"
+	}
+}

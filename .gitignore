@@ -1,0 +1,20 @@
+# ENV
+*.env
+
+# WEB
+### NPM
+node_modules/
+### BUILD
+dist/
+
+# PYTHON
+### ENV
+.venv/
+### CACHE
+__pycache__/
+### NOTEBOOKS
+.ipynb_checkpoints
+
+# RUST
+### BUILD
+target
