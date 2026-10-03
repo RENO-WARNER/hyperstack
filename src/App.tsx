@@ -36,8 +36,8 @@ export function App() {
 	return (
 		<TreeContext.Provider value={{ fresh, spawn, settle }}>
 			<div class="min-h-screen bg-white text-black">
-				<div class="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6">
-					<nav class="flex items-center justify-between border-b border-gray-200 pb-3">
+				<div class="mx-auto flex max-w-6xl flex-col px-4 py-6">
+					<nav class="flex items-center justify-between pb-3">
 						<h1 class="text-2xl font-bold">HyperStack</h1>
 						<button
 							type="button"
