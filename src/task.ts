@@ -30,7 +30,9 @@ export const getLatestActivity = (task: Task): Date | null =>
 const stamp = (task: Task): number => getLatestActivity(task)?.getTime() ?? NONE;
 
 export const sortTasks = (tasks: Task[]): Task[] =>
-	[...tasks].sort((a, b) => stamp(b) - stamp(a) || a.name.localeCompare(b.name));
+	[...tasks].sort(
+		(a, b) => Number(isCompleted(a)) - Number(isCompleted(b)) || stamp(b) - stamp(a) || a.name.localeCompare(b.name)
+	);
 
 export const arrange = (tasks: Task[], fresh: ReadonlySet<string>): Task[] => [
 	...tasks.filter((task) => fresh.has(task.id)),
