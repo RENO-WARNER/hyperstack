@@ -19,7 +19,7 @@ const BUTTON = "h-7 rounded px-2 text-sm font-bold text-white";
 const CHECK = "absolute inset-0 appearance-none rounded border-2 enabled:cursor-pointer";
 const MARK = "pointer-events-none absolute inset-0 grid place-content-center font-bold text-white";
 const ACTIVE = { button: "bg-black hover:bg-gray-800", check: "border-black bg-white", caret: "text-gray-500" };
-const MUTED = { button: "bg-gray-400 hover:bg-gray-500", check: "border-gray-400 bg-gray-400", caret: "text-gray-400" };
+const MUTED = { button: "bg-gray-300 hover:bg-gray-400", check: "border-gray-300 bg-gray-300", caret: "text-gray-400" };
 
 export function TaskComponent({ task, onChange }: Props) {
 	const tree = useContext(TreeContext);
