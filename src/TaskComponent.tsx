@@ -16,8 +16,10 @@ interface Props {
 }
 
 const BUTTON = "h-7 rounded px-2 text-sm font-bold text-white";
-const ACTIVE = { button: "bg-black hover:bg-gray-800", check: "accent-black", caret: "text-gray-500" };
-const MUTED = { button: "bg-gray-400 hover:bg-gray-500", check: "accent-gray-400", caret: "text-gray-400" };
+const CHECK = "absolute inset-0 appearance-none rounded border-2 enabled:cursor-pointer";
+const MARK = "pointer-events-none absolute inset-0 grid place-content-center font-bold text-white";
+const ACTIVE = { button: "bg-black hover:bg-gray-800", check: "border-black bg-white", caret: "text-gray-500" };
+const MUTED = { button: "bg-gray-400 hover:bg-gray-500", check: "border-gray-400 bg-gray-400", caret: "text-gray-400" };
 
 export function TaskComponent({ task, onChange }: Props) {
 	const tree = useContext(TreeContext);
@@ -86,13 +88,16 @@ export function TaskComponent({ task, onChange }: Props) {
 				<button type="button" class={`${BUTTON} ${tone.button}`} onClick={add}>
 					+
 				</button>
-				<input
-					type="checkbox"
-					class={`size-7 ${tone.check}`}
-					checked={done}
-					disabled={subs !== null}
-					onChange={check}
-				/>
+				<label class="relative size-7 shrink-0">
+					<input
+						type="checkbox"
+						class={`${CHECK} ${tone.check}`}
+						checked={done}
+						disabled={subs !== null}
+						onChange={check}
+					/>
+					{done && <span class={MARK}>✓</span>}
+				</label>
 			</div>
 			{visible && (
 				<div class="flex flex-col gap-2 pl-6">
