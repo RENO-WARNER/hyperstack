@@ -15,7 +15,9 @@ interface Props {
 	onChange: (task: Task) => void;
 }
 
-const BUTTON = "h-7 rounded bg-black px-2 text-sm font-bold text-white hover:bg-gray-800";
+const BUTTON = "h-7 rounded px-2 text-sm font-bold text-white";
+const ACTIVE = { button: "bg-black hover:bg-gray-800", check: "accent-black", caret: "text-gray-500" };
+const MUTED = { button: "bg-gray-400 hover:bg-gray-500", check: "accent-gray-400", caret: "text-gray-400" };
 
 export function TaskComponent({ task, onChange }: Props) {
 	const tree = useContext(TreeContext);
@@ -30,6 +32,7 @@ export function TaskComponent({ task, onChange }: Props) {
 
 	const subs = Array.isArray(task.prereq) ? task.prereq : null;
 	const done = isCompleted(task);
+	const tone = done ? MUTED : ACTIVE;
 	const foldable = subs !== null || task.notes !== "";
 	const visible = editing || (open && foldable);
 
@@ -73,19 +76,19 @@ export function TaskComponent({ task, onChange }: Props) {
 						class="flex flex-1 items-center gap-2 text-left"
 						onClick={() => setOpen(!open)}
 					>
-						<span class="w-4 text-gray-500">{foldable ? (open ? "▾" : "▸") : ""}</span>
+						<span class={`w-4 ${tone.caret}`}>{foldable ? (open ? "▾" : "▸") : ""}</span>
 						<span class={done ? "text-gray-400 line-through" : ""}>{task.name || "Untitled"}</span>
 					</button>
 				)}
-				<button type="button" class={BUTTON} onClick={editing ? save : edit}>
+				<button type="button" class={`${BUTTON} ${tone.button}`} onClick={editing ? save : edit}>
 					{editing ? "Save" : "Edit"}
 				</button>
-				<button type="button" class={BUTTON} onClick={add}>
+				<button type="button" class={`${BUTTON} ${tone.button}`} onClick={add}>
 					+
 				</button>
 				<input
 					type="checkbox"
-					class="size-7 accent-black"
+					class={`size-7 ${tone.check}`}
 					checked={done}
 					disabled={subs !== null}
 					onChange={check}
