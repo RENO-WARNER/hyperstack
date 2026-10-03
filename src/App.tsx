@@ -1,12 +1,12 @@
 import { useEffect, useState } from "preact/hooks";
 import { TaskComponent, TreeContext } from "./TaskComponent";
-import { arrange, blank, hydrate, type Raw, type Stack, type Task } from "./task";
+import { arrange, blank, type Edit, hydrate, modify, prune, type Raw, type Stack } from "./task";
 
 const KEY = "hyperstack";
 
 const load = (): Stack => {
 	try {
-		return (JSON.parse(localStorage.getItem(KEY) ?? "[]") as Raw[]).map(hydrate);
+		return prune((JSON.parse(localStorage.getItem(KEY) ?? "[]") as Raw[]).map(hydrate));
 	} catch {
 		return [];
 	}
@@ -31,10 +31,10 @@ export function App() {
 		setStack((prev) => [task, ...prev]);
 	};
 
-	const change = (task: Task) => setStack((prev) => prev.map((item) => (item.id === task.id ? task : item)));
+	const update = (id: string, edit: Edit) => setStack((prev) => modify(prev, id, edit));
 
 	return (
-		<TreeContext.Provider value={{ fresh, spawn, settle }}>
+		<TreeContext.Provider value={{ fresh, spawn, settle, update }}>
 			<div class="min-h-screen bg-white text-black">
 				<div class="mx-auto flex max-w-6xl flex-col px-4 py-6">
 					<nav class="flex items-center justify-between pb-3">
@@ -50,7 +50,7 @@ export function App() {
 					{stack.length === 0 && <p class="text-center text-gray-400">Nothing stacked yet.</p>}
 					<ul class="flex flex-col">
 						{arrange(stack, fresh).map((task) => (
-							<TaskComponent key={task.id} task={task} onChange={change} />
+							<TaskComponent key={task.id} task={task} />
 						))}
 					</ul>
 				</div>

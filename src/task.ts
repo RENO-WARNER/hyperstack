@@ -45,3 +45,23 @@ export const hydrate = (raw: Raw): Task => ({
 	...raw,
 	prereq: Array.isArray(raw.prereq) ? raw.prereq.map(hydrate) : raw.prereq === false ? false : new Date(raw.prereq),
 });
+
+export const shrink = (tasks: Task[]): Result | Task[] => (tasks.length > 0 ? tasks : false);
+
+export const prune = (tasks: Task[]): Task[] =>
+	tasks
+		.filter((task) => task.name !== "")
+		.map((task) => (Array.isArray(task.prereq) ? { ...task, prereq: shrink(prune(task.prereq)) } : task));
+
+export type Edit = (task: Task) => Task | null;
+
+const children = (task: Task): Task[] => (Array.isArray(task.prereq) ? task.prereq : []);
+
+export const modify = (tasks: Task[], id: string, edit: Edit): Task[] =>
+	tasks.flatMap((task) =>
+		task.id === id
+			? [edit(task)].filter((next) => next !== null)
+			: [Array.isArray(task.prereq) ? { ...task, prereq: shrink(modify(task.prereq, id, edit)) } : task]
+	);
+
+export const nest = (task: Task, child: Task): Task => ({ ...task, prereq: [child, ...children(task)] });

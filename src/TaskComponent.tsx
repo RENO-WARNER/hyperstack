@@ -1,18 +1,18 @@
 import { createContext } from "preact";
 import { useContext, useEffect, useRef, useState } from "preact/hooks";
-import { arrange, blank, isCompleted, type Task } from "./task";
+import { arrange, blank, type Edit, isCompleted, nest, type Task } from "./task";
 
 export interface Tree {
 	fresh: ReadonlySet<string>;
 	spawn: () => Task;
 	settle: (id: string) => void;
+	update: (id: string, edit: Edit) => void;
 }
 
-export const TreeContext = createContext<Tree>({ fresh: new Set(), spawn: blank, settle: () => {} });
+export const TreeContext = createContext<Tree>({ fresh: new Set(), spawn: blank, settle: () => {}, update: () => {} });
 
 interface Props {
 	task: Task;
-	onChange: (task: Task) => void;
 }
 
 const BUTTON = "h-7 rounded px-2 text-sm font-bold text-white";
@@ -21,16 +21,34 @@ const MARK = "pointer-events-none absolute inset-0 grid place-content-center fon
 const ACTIVE = { button: "bg-black hover:bg-gray-800", check: "border-black bg-white", caret: "text-gray-500" };
 const MUTED = { button: "bg-gray-300 hover:bg-gray-400", check: "border-gray-300 bg-gray-300", caret: "text-gray-400" };
 
-export function TaskComponent({ task, onChange }: Props) {
+export function TaskComponent({ task }: Props) {
 	const tree = useContext(TreeContext);
 	const [editing, setEditing] = useState(tree.fresh.has(task.id));
 	const [open, setOpen] = useState(false);
 	const [draft, setDraft] = useState({ name: task.name, notes: task.notes });
 	const input = useRef<HTMLInputElement>(null);
+	const row = useRef<HTMLLIElement>(null);
+
+	const finish = () => {
+		setEditing(false);
+		tree.settle(task.id);
+	};
+
+	const cancel = () => {
+		finish();
+		tree.update(task.id, (current) => (current.name === "" ? null : current));
+	};
 
 	useEffect(() => {
 		editing && input.current?.focus();
 	}, [editing]);
+
+	useEffect(() => {
+		const away = (event: PointerEvent) =>
+			event.target instanceof Node && !row.current?.contains(event.target) && cancel();
+		editing && document.addEventListener("pointerdown", away);
+		return () => document.removeEventListener("pointerdown", away);
+	});
 
 	const subs = Array.isArray(task.prereq) ? task.prereq : null;
 	const done = isCompleted(task);
@@ -44,23 +62,27 @@ export function TaskComponent({ task, onChange }: Props) {
 	};
 
 	const save = () => {
-		onChange({ ...task, ...draft });
-		setEditing(false);
+		if (draft.name.trim() === "") return cancel();
+		tree.update(task.id, (current) => ({ ...current, ...draft }));
+		finish();
+	};
+
+	const remove = () => {
 		tree.settle(task.id);
+		tree.update(task.id, () => null);
 	};
 
 	const add = () => {
-		onChange({ ...task, prereq: [tree.spawn(), ...(subs ?? [])] });
+		const child = tree.spawn();
+		tree.update(task.id, (current) => nest(current, child));
 		setOpen(true);
 	};
 
-	const check = () => onChange({ ...task, prereq: task.prereq === false ? new Date() : false });
-
-	const replace = (child: Task) =>
-		onChange({ ...task, prereq: (subs ?? []).map((item) => (item.id === child.id ? child : item)) });
+	const check = () =>
+		tree.update(task.id, (current) => ({ ...current, prereq: current.prereq === false ? new Date() : false }));
 
 	return (
-		<li class="flex flex-col gap-2 border border-gray-200 p-2 not-first:border-t-0">
+		<li ref={row} class="flex flex-col gap-2 border border-gray-200 p-2 not-first:border-t-0">
 			<div class="flex items-center gap-2">
 				{editing ? (
 					<input
@@ -80,6 +102,11 @@ export function TaskComponent({ task, onChange }: Props) {
 					>
 						<span class={`w-4 ${tone.caret}`}>{foldable ? (open ? "▾" : "▸") : ""}</span>
 						<span class={done ? "text-gray-400 line-through" : ""}>{task.name || "Untitled"}</span>
+					</button>
+				)}
+				{editing && (
+					<button type="button" class={`${BUTTON} ${tone.button}`} onClick={remove}>
+						Delete
 					</button>
 				)}
 				<button type="button" class={`${BUTTON} ${tone.button}`} onClick={editing ? save : edit}>
@@ -114,7 +141,7 @@ export function TaskComponent({ task, onChange }: Props) {
 					{subs && (
 						<ul class="flex flex-col">
 							{arrange(subs, tree.fresh).map((child) => (
-								<TaskComponent key={child.id} task={child} onChange={replace} />
+								<TaskComponent key={child.id} task={child} />
 							))}
 						</ul>
 					)}
