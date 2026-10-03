@@ -15,7 +15,7 @@ interface Props {
 	onChange: (task: Task) => void;
 }
 
-const BUTTON = "rounded border border-gray-300 px-2 py-0.5 text-sm hover:bg-gray-100";
+const BUTTON = "h-7 rounded bg-black px-2 text-sm font-bold text-white hover:bg-gray-800";
 
 export function TaskComponent({ task, onChange }: Props) {
 	const tree = useContext(TreeContext);
@@ -31,7 +31,7 @@ export function TaskComponent({ task, onChange }: Props) {
 	const subs = Array.isArray(task.prereq) ? task.prereq : null;
 	const done = isCompleted(task);
 	const foldable = subs !== null || task.notes !== "";
-	const visible = open || editing;
+	const visible = editing || (open && foldable);
 
 	const edit = () => {
 		setDraft({ name: task.name, notes: task.notes });
@@ -55,7 +55,7 @@ export function TaskComponent({ task, onChange }: Props) {
 		onChange({ ...task, prereq: (subs ?? []).map((item) => (item.id === child.id ? child : item)) });
 
 	return (
-		<li class="flex flex-col gap-2 rounded border border-gray-200 p-2">
+		<li class="flex flex-col gap-2 border border-gray-200 p-2 not-first:border-t-0">
 			<div class="flex items-center gap-2">
 				{editing ? (
 					<input
@@ -83,7 +83,13 @@ export function TaskComponent({ task, onChange }: Props) {
 				<button type="button" class={BUTTON} onClick={add}>
 					+
 				</button>
-				<input type="checkbox" class="size-4" checked={done} disabled={subs !== null} onChange={check} />
+				<input
+					type="checkbox"
+					class="size-7 accent-black"
+					checked={done}
+					disabled={subs !== null}
+					onChange={check}
+				/>
 			</div>
 			{visible && (
 				<div class="flex flex-col gap-2 pl-6">
@@ -98,7 +104,7 @@ export function TaskComponent({ task, onChange }: Props) {
 						task.notes && <p class="whitespace-pre-wrap text-sm text-gray-600">{task.notes}</p>
 					)}
 					{subs && (
-						<ul class="flex flex-col gap-2">
+						<ul class="flex flex-col">
 							{arrange(subs, tree.fresh).map((child) => (
 								<TaskComponent key={child.id} task={child} onChange={replace} />
 							))}

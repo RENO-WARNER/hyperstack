@@ -36,19 +36,19 @@ export function App() {
 	return (
 		<TreeContext.Provider value={{ fresh, spawn, settle }}>
 			<div class="min-h-screen bg-white text-black">
-				<div class="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-6">
+				<div class="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6">
 					<nav class="flex items-center justify-between border-b border-gray-200 pb-3">
 						<h1 class="text-2xl font-bold">HyperStack</h1>
 						<button
 							type="button"
-							class="rounded bg-black px-3 py-1 text-white hover:bg-gray-800"
+							class="rounded bg-black px-3 py-1 font-bold text-white hover:bg-gray-800"
 							onClick={add}
 						>
 							New
 						</button>
 					</nav>
 					{stack.length === 0 && <p class="text-center text-gray-400">Nothing stacked yet.</p>}
-					<ul class="flex flex-col gap-2">
+					<ul class="flex flex-col">
 						{arrange(stack, fresh).map((task) => (
 							<TaskComponent key={task.id} task={task} onChange={change} />
 						))}
